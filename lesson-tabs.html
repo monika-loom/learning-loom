@@ -43,7 +43,7 @@
   <script>
 <script>
 /* ----------- 1.  YOUR FREE KEY ----------- */
-const GEMINI_KEY = 'AIzaSyDYudU4FcYNxwgFLcTuXKLr_bI4P6YzxG4';   // ← replace with the key you copied
+const GEMINI_KEY = '';   // ← replace with the key you copied
 
 /* ----------- 2.  READ TOPIC & LEVEL ----------- */
 const topic   = sessionStorage.getItem('chatTopic') || 'Sun';
@@ -78,7 +78,7 @@ Create a tiny JSON lesson for "${topic}" aimed at ${ageBand}.
 Keys: rhymes (2 strings), stories (2 strings), activities (3 strings), worksheets (2 strings), videos (2 strings with real YouTube links), pdfs (2 objects: {name, url} using ONLY public URLs).
 Tag every string with [AI] or [Web] depending on source.
 `;
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyDYudU4FcYNxwgFLcTuXKLr_bI4P6YzxG4`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=`;
   const raw = await fetch(url, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -126,4 +126,5 @@ function startNew() { window.location = 'topic-level.html'; }
 </script>    
   </script>
 </body>
+
 </html>
