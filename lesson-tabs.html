@@ -60,20 +60,31 @@ async function getGeminiKey() {
 
     /* ----------- 3.  ASK GEMINI (FREE) ----------- */
     async function askGemini(topic, ageBand) {
-      const key = await getGeminiKey();
-      const prompt = `
-Create a tiny JSON lesson for "${topic}" aimed at ${ageBand}.
-Keys: rhymes (2 strings), stories (2 strings), activities (3 strings), worksheets (2 strings), videos (2 strings with real YouTube links), pdfs (2 objects: {name, url} using ONLY public URLs).
-Tag every string with [AI] or [Web] depending on source.
+  const key = await getGeminiKey();
+  const prompt = `
+Return **only** valid JSON, no extra text.
+{
+  "rhymes": ["string1", "string2"],
+  "stories": ["story1", "story2"],
+  "activities": ["act1", "act2", "act3"],
+  "worksheets": ["ws1", "ws2"],
+  "videos": ["https://youtube.com/...", "https://youtube.com/..."],
+  "pdfs": [{"name":"file1","url":"https://example.com/1.pdf"},{"name":"file2","url":"https://example.com/2.pdf"}]
+}
+Topic: "${topic}"  Age band: ${ageBand}
 `;
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
-      const raw = await fetch(url, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({contents: [{parts: [{text: prompt}]}]})
-      }).then(r => r.json());
-      return JSON.parse(raw.candidates[0].content.parts[0].text);
-    }
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+  const raw = await fetch(url, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({contents: [{parts: [{text: prompt}]}]})
+  }).then(r => r.json());
+
+  // Gemini sometimes wraps answer in ```json … ```
+  let reply = raw.candidates[0].content.parts[0].text;
+  reply = reply.replace(/```json|```/g, '').trim();   // strip markdown fences
+  return JSON.parse(reply);                           // now safe to parse
+}
 
     /* ----------- 4.  BUILD TABS (same UI) ----------- */
     const tabsData = [
