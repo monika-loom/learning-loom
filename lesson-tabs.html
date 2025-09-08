@@ -57,7 +57,7 @@
     async function getGeminiKey() {
       // If you haven’t set up the worker yet, temporarily paste your NEW key here
       // while you create the worker – then delete this line once the worker is live.
-      return fetch('/.netlify/functions/gemini-key')
+      return fetch('/.netlify/functions/GEMINI_KEY')
         .then(r => r.text())
         .catch(() => 'TEMP-PASTE-NEW-KEY-HERE');   // ← fallback only while you build worker
     }
