@@ -1,0 +1,255 @@
+/* styles.css (the pretty design) */
+:root {
+  --bg-deep: #0b0c1e;
+  --bg-mid: #151632;
+  --glass: rgba(32, 35, 75, 0.45);
+  --border: rgba(0, 242, 255, 0.18);
+  --cyan: #00f2ff;
+  --magenta: #ff00c1;
+  --text: #ffffff;
+  --text-dim: rgba(255, 255, 255, 0.65);
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, var(--bg-deep), var(--bg-mid));
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+/* ---------- NEW ESOLANR-STYLE BACKDROP ---------- */
+.backdrop {
+  position: fixed;        /* behind everything */
+  inset: 0;               /* top right bottom left 0 */
+  z-index: -1;            /* stay back */
+  pointer-events: none;   /* clicks pass through */
+  overflow: hidden;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);     /* the soft glow */
+  opacity: 0.15;          /* subtle */
+  animation: drift 20s infinite ease-in-out;
+}
+
+/* cyan orb – top-left */
+.orb1 {
+  width: 50vmax;          /* responsive size */
+  height: 50vmax;
+  top: -15%;
+  left: -15%;
+  background: radial-gradient(circle at 30% 30%, #00F2FF 0%, transparent 70%);
+  animation-delay: 0s;
+}
+
+/* magenta orb – bottom-right */
+.orb2 {
+  width: 45vmax;
+  height: 45vmax;
+  bottom: -15%;
+  right: -10%;
+  background: radial-gradient(circle at 70% 70%, #FF00C1 0%, transparent 70%);
+  animation-delay: 7s;
+}
+
+/* smaller accent orb – centre */
+.orb3 {
+  width: 30vmax;
+  height: 30vmax;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  background: radial-gradient(circle, #FF00C1 0%, #00F2FF 100%);
+  opacity: 0.1;
+  animation-delay: 14s;
+}
+
+/* gentle floating motion */
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -30px) scale(1.05); }
+  66% { transform: translate(-20px, 20px) scale(0.95); }
+}
+/* ---------- LOOM-THEME LAYER ---------- */
+.loom-title {
+  font-size: clamp(2.8rem, 7vw, 4.5rem);
+  font-weight: 700;
+  letter-spacing: -1px;
+  background: linear-gradient(90deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s infinite linear;
+  margin-bottom: 0.5rem;
+}
+.loom-sub {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  color: rgba(255, 237, 78, 0.85);
+  margin-bottom: 2.5rem;
+}
+@keyframes shimmer {
+  0% { background-position: -100% center; }
+  100% { background-position: 100% center; }
+}
+/* tiny gold thread sparkle orb */
+.orb-gold {
+  position: absolute;
+  width: 15vmax;
+  height: 15vmax;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.25) 0%, transparent 70%);
+  filter: blur(60px);
+  opacity: 0.4;
+  top: 20%;
+  left: 70%;
+  animation: drift 25s infinite ease-in-out;
+  animation-delay: 10s;
+}
+
+
+.shape:nth-child(1) {
+  width: 400px;
+  height: 400px;
+  top: -10%;
+  left: -10%;
+  animation-delay: 0s;
+}
+.shape:nth-child(2) {
+  width: 300px;
+  height: 300px;
+  bottom: -15%;
+  right: -5%;
+  animation-delay: 4s;
+}
+.shape:nth-child(3) {
+  width: 200px;
+  height: 200px;
+  top: 40%;
+  left: 70%;
+  animation-delay: 8s;
+}
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-30px) scale(1.08);
+  }
+}
+.container {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  padding: 2rem;
+}
+h1 {
+  font-size: clamp(3rem, 8vw, 5rem);
+  font-weight: 700;
+  letter-spacing: -2px;
+  margin-bottom: 0.75rem;
+  background: linear-gradient(90deg, var(--cyan), var(--magenta));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: fadeInUp 1s ease-out;
+}
+.subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  color: var(--text-dim);
+  margin-bottom: 3rem;
+  animation: fadeInUp 1s ease-out 0.2s both;
+}
+.auth-buttons {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: fadeInUp 1s ease-out 0.4s both;
+}
+.btn {
+  padding: 1rem 2.5rem;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.btn-primary {
+  background: linear-gradient(90deg, var(--cyan), var(--magenta));
+  color: var(--bg-deep);
+  box-shadow: 0 4px 20px rgba(0, 242, 255, 0.25);
+}
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(0, 242, 255, 0.4);
+}
+.btn-secondary {
+  background: var(--glass);
+  color: var(--text);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+}
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--cyan);
+  transform: translateY(-3px);
+}
+.made-by {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  font-size: 0.875rem;
+  color: var(--text-dim);
+}
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* ---------- MODERN DYNAMIC HEADING ---------- */
+.modern-title {
+  font-size: clamp(2.8rem, 7vw, 4.5rem);
+  font-weight: 700;
+  letter-spacing: -1px;
+  background: linear-gradient(135deg, #00F2FF 0%, #764BA2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% 200%;
+  animation: shimmer 3s ease infinite;
+  margin-bottom: 0.5rem;
+}
+
+.modern-sub {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  background: linear-gradient(90deg, #FFFFFF 0%, #A0A0D0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 2.5rem;
+}
+
+@keyframes shimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
