@@ -52,15 +52,11 @@
     };
 
     /* ----------- 2.  FETCH KEY FROM GITHUB SECRET (SERVER-SIDE) ----------- */
-    /*  Because GitHub Pages is static, we use a tiny Cloudflare Worker (100 % free)
-        to return the key without exposing it.  See Step 3 below.                */
-    async function getGeminiKey() {
-      // If you haven’t set up the worker yet, temporarily paste your NEW key here
-      // while you create the worker – then delete this line once the worker is live.
-      return fetch('/.netlify/functions/GEMINI_KEY')
-        .then(r => r.text())
-        .catch(() => 'TEMP-PASTE-NEW-KEY-HERE');   // ← fallback only while you build worker
-    }
+    /* ----------  TEMPORARY KEY (while you build the worker)  ---------- */
+async function getGeminiKey() {
+  // Paste your NEW Gemini key between the quotes, no spaces:
+  return 'AIzaSyDmtfdML20sw0ZHCU-aJxP7RRsAOWjbDE0';   // <-- your real key
+}
 
     /* ----------- 3.  ASK GEMINI (FREE) ----------- */
     async function askGemini(topic, ageBand) {
