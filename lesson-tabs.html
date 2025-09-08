@@ -6,19 +6,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="styles.css">
   <style>
-    .tabs { display:flex; gap:0.5rem; margin-bottom:1.5rem; flex-wrap:wrap; }
-    .tab { padding:0.6rem 1.2rem; border-radius:50px; cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--text-dim); transition:.3s; }
-    .tab.active { background:linear-gradient(90deg, var(--cyan), var(--magenta)); color:var(--bg-deep); border-color:transparent; }
-    .panel { display:none; }
-    .panel.active { display:block; animation:fadeIn .4s; }
-    @keyframes fadeIn { from {opacity:0; transform:translateY(10px);} to {opacity:1; transform:translateY(0);} }
-    .badge { font-size:.75rem; padding:.2rem .6rem; border-radius:50px; margin-left:.5rem; vertical-align:middle; }
-    .ai { background:var(--magenta); color:#fff; }
-    .web { background:var(--cyan); color:var(--bg-deep); }
-    .pdf-list { list-style:none; padding:0; }
-    .pdf-list li { display:flex; justify-content:space-between; align-items:center; padding:.6rem 0; border-bottom:1px solid var(--border); }
-    .pdf-list a { color:var(--cyan); text-decoration:none; font-weight:500; }
-    .pdf-list a:hover { text-decoration:underline; }
+    .tabs{ display:flex; gap:.5rem; margin-bottom:1.5rem; flex-wrap:wrap; }
+    .tab{ padding:.6rem 1.2rem; border-radius:50px; cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--text-dim); transition:.3s; }
+    .tab.active{ background:linear-gradient(90deg, var(--cyan), var(--magenta)); color:var(--bg-deep); border-color:transparent; }
+    .panel{ display:none; }
+    .panel.active{ display:block; animation:fadeIn .4s; }
+    @keyframes fadeIn{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+    .badge{ font-size:.75rem; padding:.2rem .6rem; border-radius:50px; margin-left:.5rem; vertical-align:middle; }
+    .ai{ background:var(--magenta); color:#fff; }
+    .web{ background:var(--cyan); color:var(--bg-deep); }
+    .pdf-list{ list-style:none; padding:0; }
+    .pdf-list li{ display:flex; justify-content:space-between; align-items:center; padding:.6rem 0; border-bottom:1px solid var(--border); }
+    .pdf-list a{ color:var(--cyan); text-decoration:none; font-weight:500; }
+    .pdf-list a:hover{ text-decoration:underline; }
   </style>
 </head>
 <body>
@@ -41,90 +41,95 @@
   <div class="made-by">Made By: Monika Pathak</div>
 
   <script>
-<script>
-/* ----------- 1.  YOUR FREE KEY ----------- */
-const GEMINI_KEY = '';   // ← replace with the key you copied
+    /* ----------- 1.  READ TOPIC & LEVEL ----------- */
+    const topic   = sessionStorage.getItem('chatTopic') || 'Sun';
+    const level   = sessionStorage.getItem('chatLevel') || 'elementary';
+    const levelText = {
+      elementary:'Montessori – Ages 3-6',
+      primary:'Primary – Ages 7-11',
+      secondary:'Secondary – Ages 12-15',
+      higher:'Higher Secondary – Ages 16-18'
+    };
 
-/* ----------- 2.  READ TOPIC & LEVEL ----------- */
-const topic   = sessionStorage.getItem('chatTopic') || 'Sun';
-const level   = sessionStorage.getItem('chatLevel') || 'elementary';
-const levelText = {
-  elementary:'Montessori – Ages 3-6',
-  primary:'Primary – Ages 7-11',
-  secondary:'Secondary – Ages 12-15',
-  higher:'Higher Secondary – Ages 16-18'
-};
+    /* ----------- 2.  FETCH KEY FROM GITHUB SECRET (SERVER-SIDE) ----------- */
+    /*  Because GitHub Pages is static, we use a tiny Cloudflare Worker (100 % free)
+        to return the key without exposing it.  See Step 3 below.                */
+    async function getGeminiKey() {
+      // If you haven’t set up the worker yet, temporarily paste your NEW key here
+      // while you create the worker – then delete this line once the worker is live.
+      return fetch('/.netlify/functions/gemini-key')
+        .then(r => r.text())
+        .catch(() => 'TEMP-PASTE-NEW-KEY-HERE');   // ← fallback only while you build worker
+    }
 
-/* ----------- 3.  BUILD TABS (same UI) ----------- */
-const tabsData = [
-  {key:'rhymes',label:'Rhymes'},
-  {key:'stories',label:'Stories'},
-  {key:'activities',label:'Activities'},
-  {key:'lessonPlans',label:'Lesson Plans'},
-  {key:'worksheets',label:'Worksheets'},
-  {key:'videos',label:'Videos'},
-  {key:'pdfs',label:'PDFs'}
-];
-
-window.onload = async () => {
-  document.getElementById('pageTitle').textContent = `Lesson: ${topic} – ${levelText[level]}`;
-  const aiData = await askGemini(topic, level);
-  buildTabs(aiData);
-};
-
-async function askGemini(topic, ageBand) {
-  const prompt = `
+    /* ----------- 3.  ASK GEMINI (FREE) ----------- */
+    async function askGemini(topic, ageBand) {
+      const key = await getGeminiKey();
+      const prompt = `
 Create a tiny JSON lesson for "${topic}" aimed at ${ageBand}.
 Keys: rhymes (2 strings), stories (2 strings), activities (3 strings), worksheets (2 strings), videos (2 strings with real YouTube links), pdfs (2 objects: {name, url} using ONLY public URLs).
 Tag every string with [AI] or [Web] depending on source.
 `;
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=`;
-  const raw = await fetch(url, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({contents: [{parts: [{text: prompt}]}]})
-  }).then(r => r.json());
-  return JSON.parse(raw.candidates[0].content.parts[0].text);
-}
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`;
+      const raw = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({contents: [{parts: [{text: prompt}]}]})
+      }).then(r => r.json());
+      return JSON.parse(raw.candidates[0].content.parts[0].text);
+    }
 
-function buildTabs(data) {
-  const tabsContainer = document.getElementById('tabs');
-  const panelsContainer = document.getElementById('panels');
-  tabsData.forEach((tab, idx) => {
-    // tab button
-    const btn = document.createElement('button');
-    btn.className = 'tab' + (idx === 0 ? ' active' : '');
-    btn.textContent = tab.label;
-    btn.onclick = () => switchTab(tab.key, btn);
-    tabsContainer.appendChild(btn);
-    // panel
-    const panel = document.createElement('div');
-    panel.id = 'panel-' + tab.key;
-    panel.className = 'panel' + (idx === 0 ? ' active' : '');
-    panel.innerHTML = buildPanelContent(tab.key, data);
-    panelsContainer.appendChild(panel);
-  });
-}
+    /* ----------- 4.  BUILD TABS (same UI) ----------- */
+    const tabsData = [
+      {key:'rhymes',label:'Rhymes'},
+      {key:'stories',label:'Stories'},
+      {key:'activities',label:'Activities'},
+      {key:'lessonPlans',label:'Lesson Plans'},
+      {key:'worksheets',label:'Worksheets'},
+      {key:'videos',label:'Videos'},
+      {key:'pdfs',label:'PDFs'}
+    ];
 
-function switchTab(key, btn) {
-  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('panel-' + key).classList.add('active');
-}
+    window.onload = async () => {
+      document.getElementById('pageTitle').textContent = `Lesson: ${topic} – ${levelText[level]}`;
+      const aiData = await askGemini(topic, level);
+      buildTabs(aiData);
+    };
 
-function buildPanelContent(key, data) {
-  const items = data[key] || { ai: [], web: [] };
-  let html = '';
-  if (items.ai && items.ai.length) html += `<h3>AI Generated <span class="badge ai">AI</span></h3><ul>${items.ai.map(item => `<li>${item}</li>`).join('')}</ul>`;
-  if (items.web && items.web.length) html += `<h3>Web Search <span class="badge web">Web</span></h3><ul>${items.web.map(item => `<li>${item}</li>`).join('')}</ul>`;
-  if (key === 'pdfs' && items.web && items.web.length) html = `<h3>Download PDFs <span class="badge web">Web</span></h3><ul class="pdf-list">${items.web.map(pdf => `<li><span>${pdf.name}</span><a href="${pdf.url}" download>Download</a></li>`).join('')}</ul>`;
-  return html || '<p>No content available.</p>';
-}
+    async function buildTabs(data) {
+      const tabsContainer = document.getElementById('tabs');
+      const panelsContainer = document.getElementById('panels');
+      tabsData.forEach((tab, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'tab' + (idx === 0 ? ' active' : '');
+        btn.textContent = tab.label;
+        btn.onclick = () => switchTab(tab.key, btn);
+        tabsContainer.appendChild(btn);
+        const panel = document.createElement('div');
+        panel.id = 'panel-' + tab.key;
+        panel.className = 'panel' + (idx === 0 ? ' active' : '');
+        panel.innerHTML = buildPanelContent(tab.key, data);
+        panelsContainer.appendChild(panel);
+      });
+    }
 
-function startNew() { window.location = 'topic-level.html'; }
-</script>    
+    function switchTab(key, btn) {
+      document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('panel-' + key).classList.add('active');
+    }
+
+    function buildPanelContent(key, data) {
+      const items = data[key] || { ai: [], web: [] };
+      let html = '';
+      if (items.ai && items.ai.length) html += `<h3>AI Generated <span class="badge ai">AI</span></h3><ul>${items.ai.map(item => `<li>${item}</li>`).join('')}</ul>`;
+      if (items.web && items.web.length) html += `<h3>Web Search <span class="badge web">Web</span></h3><ul>${items.web.map(item => `<li>${item}</li>`).join('')}</ul>`;
+      if (key === 'pdfs' && items.web && items.web.length) html = `<h3>Download PDFs <span class="badge web">Web</span></h3><ul class="pdf-list">${items.web.map(pdf => `<li><span>${pdf.name}</span><a href="${pdf.url}" download>Download</a></li>`).join('')}</ul>`;
+      return html || '<p>No content available.</p>';
+    }
+
+    function startNew() { window.location = 'topic-level.html'; }
   </script>
 </body>
-
 </html>
