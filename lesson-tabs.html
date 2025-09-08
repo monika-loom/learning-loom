@@ -41,107 +41,89 @@
   <div class="made-by">Made By: Monika Pathak</div>
 
   <script>
-    /* ---- 1. read topic & level ---- */
-    const topic = sessionStorage.getItem('chatTopic') || 'Sun';
-    const level = sessionStorage.getItem('chatLevel') || 'elementary';
-    const levelText = {
-      elementary:'Montessori – Ages 3-6',
-      primary:'Primary – Ages 7-11',
-      secondary:'Secondary – Ages 12-15',
-      higher:'Higher Secondary – Ages 16-18'
-    };
+<script>
+/* ----------- 1.  YOUR FREE KEY ----------- */
+const GEMINI_KEY = 'AIzaSyDYudU4FcYNxwgFLcTuXKLr_bI4P6YzxG4';   // ← replace with the key you copied
 
-    /* ---- 2. mock AI + web content ---- */
-    const lessonBank = {
-      elementary:{
-        rhymes:{ ai:['Sun, Sun, Mr Golden Sun,<br>Please shine down on me!','Yellow, bright and full of heat,<br>Morning Sun feels oh-so sweet!'], web:['Twinkle, twinkle little Sun…'] },
-        stories:{ ai:['Bunny asks Mummy Rabbit why the sky is warm.','Mummy calls the Sun “our big lamp.”'], web:['The Sun and the Wind – Aesop fable'] },
-        activities:{ ai:['Paper-plate Sun craft','Outdoor shadow tracing','Sunrise yoga stretch'], web:['Sun sensory bin'] },
-        lessonPlans:{ ai:['3-day Montessori plan'], web:['<a href="https://example.com/montessori.pdf" download>Montessori PDF</a>'] },
-        worksheets:{ ai:['Trace-the-Sun worksheet'], web:['<a href="https://example.com/shapes.pdf" download>Shape Hunt PDF</a>'] },
-        videos:{ web:['<a href="https://youtube.com/watch?v=abc" target="_blank">SciShow Kids – Sun</a>'] },
-        pdfs:{ web:[{name:'Montessori PDF',url:'https://example.com/montessori.pdf'},{name:'Shape Hunt',url:'https://example.com/shapes.pdf'}] }
-      },
-      primary:{
-        rhymes:{ ai:['Nuclear fusion in the core…'], web:['The Sun is a star…'] },
-        stories:{ ai:['Sunny the Photon’s million-year journey.'], web:['Myth-busting “The Sun is on fire”'] },
-        activities:{ ai:['Build a simple sundial','Sun-fact flip-book'], web:['Solar oven s’mores'] },
-        lessonPlans:{ ai:['5-day unit plan'], web:['<a href="https://example.com/primary.pdf" download>Primary PDF</a>'] },
-        worksheets:{ ai:['Label-the-Sun-parts','Sunspot graph sheet'], web:['<a href="https://example.com/skip.pdf" download>Skip-Count PDF</a>'] },
-        videos:{ web:['<a href="https://youtube.com/watch?v=def" target="_blank">Crash Course Kids – Sun</a>'] },
-        pdfs:{ web:[{name:'Primary PDF',url:'https://example.com/primary.pdf'},{name:'Skip-Count PDF',url:'https://example.com/skip.pdf'}] }
-      },
-      secondary:{
-        rhymes:{ ai:['Fusion chains in the core make light…'], web:['Sunspots dance in an eleven-year beat…'] },
-        stories:{ ai:['Space-weather forecaster saves a satellite.'], web:['Case study: Carrington Event 1859'] },
-        activities:{ ai:['Plot 30-day sunspot numbers','Pin-hole projector'], web:['Build a simple spectroscope'] },
-        lessonPlans:{ ai:['Week-long module'], web:['<a href="https://example.com/secondary.pdf" download>Secondary PDF</a>'] },
-        worksheets:{ ai:['Sun-layer crossword','Fusion equation fill-in'], web:['<a href="https://example.com/triangle.pdf" download>Triangle Cards PDF</a>'] },
-        videos:{ web:['<a href="https://youtube.com/watch?v=ghi" target="_blank">NASA – Sun 101</a>'] },
-        pdfs:{ web:[{name:'Secondary PDF',url:'https://example.com/secondary.pdf'},{name:'Triangle Cards',url:'https://example.com/triangle.pdf'}] }
-      },
-      higher:{
-        rhymes:{ ai:['Proton-proton chains and CNO cycles shine…'], web:['MHD waves heat the coronal sea…'] },
-        stories:{ ai:['Grad student solves coronal heating with ML.'], web:['Interview with Dr. Kelly Korreck (NASA)'] },
-        activities:{ ai:['Python fusion-rate sim','Analyse SDO FITS images'], web:['Calculate solar constant'] },
-        lessonPlans:{ ai:['2-week advanced unit'], web:['<a href="https://example.com/higher.pdf" download>Higher PDF</a>'] },
-        worksheets:{ ai:['Fusion cross-section derivations'], web:['<a href="https://example.com/phonics.pdf" download>Phonics PDF</a>'] },
-        videos:{ web:['<a href="https://youtube.com/watch?v=jkl" target="_blank">PBS Space-Time – Corona Heat</a>'] },
-        pdfs:{ web:[{name:'Higher PDF',url:'https://example.com/higher.pdf'},{name:'Phonics PDF',url:'https://example.com/phonics.pdf'}] }
-      }
-    };
+/* ----------- 2.  READ TOPIC & LEVEL ----------- */
+const topic   = sessionStorage.getItem('chatTopic') || 'Sun';
+const level   = sessionStorage.getItem('chatLevel') || 'elementary';
+const levelText = {
+  elementary:'Montessori – Ages 3-6',
+  primary:'Primary – Ages 7-11',
+  secondary:'Secondary – Ages 12-15',
+  higher:'Higher Secondary – Ages 16-18'
+};
 
-    /* ---- 3. build tabs & panels ---- */
-    const tabsData = [
-      {key:'rhymes',label:'Rhymes'},
-      {key:'stories',label:'Stories'},
-      {key:'activities',label:'Activities'},
-      {key:'lessonPlans',label:'Lesson Plans'},
-      {key:'worksheets',label:'Worksheets'},
-      {key:'videos',label:'Videos'},
-      {key:'pdfs',label:'PDFs'}
-    ];
+/* ----------- 3.  BUILD TABS (same UI) ----------- */
+const tabsData = [
+  {key:'rhymes',label:'Rhymes'},
+  {key:'stories',label:'Stories'},
+  {key:'activities',label:'Activities'},
+  {key:'lessonPlans',label:'Lesson Plans'},
+  {key:'worksheets',label:'Worksheets'},
+  {key:'videos',label:'Videos'},
+  {key:'pdfs',label:'PDFs'}
+];
 
-    function buildTabs() {
-      const tabsContainer = document.getElementById('tabs');
-      const panelsContainer = document.getElementById('panels');
-      tabsData.forEach((tab, idx) => {
-        // tab button
-        const btn = document.createElement('button');
-        btn.className = 'tab' + (idx === 0 ? ' active' : '');
-        btn.textContent = tab.label;
-        btn.onclick = () => switchTab(tab.key, btn);
-        tabsContainer.appendChild(btn);
-        // panel
-        const panel = document.createElement('div');
-        panel.id = 'panel-' + tab.key;
-        panel.className = 'panel' + (idx === 0 ? ' active' : '');
-        panel.innerHTML = buildPanelContent(tab.key);
-        panelsContainer.appendChild(panel);
-      });
-    }
-    function switchTab(key, btn) {
-      document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('panel-' + key).classList.add('active');
-    }
-    function buildPanelContent(key) {
-      const data = lessonBank[level][key];
-      if (!data) return '<p>No content available.</p>';
-      let html = '';
-      if (data.ai && data.ai.length) html += `<h3>AI Generated <span class="badge ai">AI</span></h3><ul>${data.ai.map(item => `<li>${item}</li>`).join('')}</ul>`;
-      if (data.web && data.web.length) html += `<h3>Web Search <span class="badge web">Web</span></h3><ul>${data.web.map(item => `<li>${item}</li>`).join('')}</ul>`;
-      if (key === 'pdfs' && data.web && data.web.length) html = `<h3>Download PDFs <span class="badge web">Web</span></h3><ul class="pdf-list">${data.web.map(pdf => `<li><span>${pdf.name}</span><a href="${pdf.url}" download>Download</a></li>`).join('')}</ul>`;
-      return html || '<p>No content available.</p>';
-    }
+window.onload = async () => {
+  document.getElementById('pageTitle').textContent = `Lesson: ${topic} – ${levelText[level]}`;
+  const aiData = await askGemini(topic, level);
+  buildTabs(aiData);
+};
 
-    /* ---- 4. on load ---- */
-    window.onload = () => {
-      document.getElementById('pageTitle').textContent = `Lesson: ${topic} – ${levelText[level]}`;
-      buildTabs();
-    };
-    function startNew() { window.location = 'topic-level.html'; }
+async function askGemini(topic, ageBand) {
+  const prompt = `
+Create a tiny JSON lesson for "${topic}" aimed at ${ageBand}.
+Keys: rhymes (2 strings), stories (2 strings), activities (3 strings), worksheets (2 strings), videos (2 strings with real YouTube links), pdfs (2 objects: {name, url} using ONLY public URLs).
+Tag every string with [AI] or [Web] depending on source.
+`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyDYudU4FcYNxwgFLcTuXKLr_bI4P6YzxG4`;
+  const raw = await fetch(url, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({contents: [{parts: [{text: prompt}]}]})
+  }).then(r => r.json());
+  return JSON.parse(raw.candidates[0].content.parts[0].text);
+}
+
+function buildTabs(data) {
+  const tabsContainer = document.getElementById('tabs');
+  const panelsContainer = document.getElementById('panels');
+  tabsData.forEach((tab, idx) => {
+    // tab button
+    const btn = document.createElement('button');
+    btn.className = 'tab' + (idx === 0 ? ' active' : '');
+    btn.textContent = tab.label;
+    btn.onclick = () => switchTab(tab.key, btn);
+    tabsContainer.appendChild(btn);
+    // panel
+    const panel = document.createElement('div');
+    panel.id = 'panel-' + tab.key;
+    panel.className = 'panel' + (idx === 0 ? ' active' : '');
+    panel.innerHTML = buildPanelContent(tab.key, data);
+    panelsContainer.appendChild(panel);
+  });
+}
+
+function switchTab(key, btn) {
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-' + key).classList.add('active');
+}
+
+function buildPanelContent(key, data) {
+  const items = data[key] || { ai: [], web: [] };
+  let html = '';
+  if (items.ai && items.ai.length) html += `<h3>AI Generated <span class="badge ai">AI</span></h3><ul>${items.ai.map(item => `<li>${item}</li>`).join('')}</ul>`;
+  if (items.web && items.web.length) html += `<h3>Web Search <span class="badge web">Web</span></h3><ul>${items.web.map(item => `<li>${item}</li>`).join('')}</ul>`;
+  if (key === 'pdfs' && items.web && items.web.length) html = `<h3>Download PDFs <span class="badge web">Web</span></h3><ul class="pdf-list">${items.web.map(pdf => `<li><span>${pdf.name}</span><a href="${pdf.url}" download>Download</a></li>`).join('')}</ul>`;
+  return html || '<p>No content available.</p>';
+}
+
+function startNew() { window.location = 'topic-level.html'; }
+</script>    
   </script>
 </body>
 </html>
