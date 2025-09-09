@@ -60,7 +60,7 @@ async function getGeminiKey() {
 
     /* ----------- 3.  ASK GEMINI (FREE) ----------- */
     async function askGemini(topic, ageBand) {
-  const key = 'AIzaSyBxxxxxxxxxxxxxxxxxxxx';   // ← paste your NEW key here (temporary)
+  const key = await fetch('https://gemini-key-worker.vip-pathak-ai.workers.dev/').then(r => r.text());
   const prompt = `
 Return **only** valid JSON, no extra text, no markdown fences.
 {
@@ -78,12 +78,14 @@ Topic: "${topic}"  Age band: ${ageBand}
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({contents: [{parts: [{text: prompt}]}]})
-  }).then(r => r.json());
+  });
 
-  // Strip any accidental markdown fences
-  let reply = raw.candidates[0].content.parts[0].text;
-  reply = reply.replace(/```json|```/g, '').trim();
-  return JSON.parse(reply);
+  // Gemini sometimes replies plain text or fences – strip and validate
+  if (!raw.ok) throw new Error('Gemini error: ' + JSON.stringify(raw));
+  let reply = raw.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+  reply = reply.replace(/```json|```/g, '').trim();   // remove accidental markdown
+  try { return JSON.parse(reply); }
+  catch (e) { console.error('Bad JSON:', reply); throw e; }
 }
 
     /* ----------- 4.  BUILD TABS (same UI) ----------- */
