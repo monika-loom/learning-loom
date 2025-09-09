@@ -55,14 +55,14 @@
     /* ----------  TEMPORARY KEY (while you build the worker)  ---------- */
 async function getGeminiKey() {
   // Paste your NEW Gemini key between the quotes, no spaces:
-  return '';   // <-- your real key
+  return fetch('https://gemini-key-worker.vip-pathak-ai.workers.dev/').then(r => r.text());
 }
 
     /* ----------- 3.  ASK GEMINI (FREE) ----------- */
     async function askGemini(topic, ageBand) {
-  const key = await getGeminiKey();
+  const key = 'AIzaSyBxxxxxxxxxxxxxxxxxxxx';   // ← paste your NEW key here (temporary)
   const prompt = `
-Return **only** valid JSON, no extra text.
+Return **only** valid JSON, no extra text, no markdown fences.
 {
   "rhymes": ["string1", "string2"],
   "stories": ["story1", "story2"],
@@ -80,10 +80,10 @@ Topic: "${topic}"  Age band: ${ageBand}
     body: JSON.stringify({contents: [{parts: [{text: prompt}]}]})
   }).then(r => r.json());
 
-  // Gemini sometimes wraps answer in ```json … ```
+  // Strip any accidental markdown fences
   let reply = raw.candidates[0].content.parts[0].text;
-  reply = reply.replace(/```json|```/g, '').trim();   // strip markdown fences
-  return JSON.parse(reply);                           // now safe to parse
+  reply = reply.replace(/```json|```/g, '').trim();
+  return JSON.parse(reply);
 }
 
     /* ----------- 4.  BUILD TABS (same UI) ----------- */
