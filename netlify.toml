@@ -1,6 +1,6 @@
 [[redirects]]
   from = "/gemini-key"
-  to = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyB19OZsaoKd2QaLYHUq0419N4S6X2P6STE"
+  to = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key="
   status = 200
   force = true
 
@@ -8,4 +8,5 @@
   for = "/*"
   [headers.values]
     X-Frame-Options = "DENY"
+
     X-Content-Type-Options = "nosniff"
